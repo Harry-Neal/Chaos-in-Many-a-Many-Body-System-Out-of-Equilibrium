@@ -1,0 +1,14 @@
+# ignore ALL .log files
+*.log
+
+# ignore ALL .exe files
+*.exe
+
+# ignore ALL .o files
+*.o
+
+# ignore ALL files in ANY directory named build
+build/
+
+# ignore ALL files in ANY directory named .vscode
+.vscode/
