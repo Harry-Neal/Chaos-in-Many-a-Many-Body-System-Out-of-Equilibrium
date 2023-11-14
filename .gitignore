@@ -7,6 +7,9 @@
 # ignore ALL .o files
 *.o
 
+# ignore ALL files in ANY directory named data
+data/
+
 # ignore ALL files in ANY directory named build
 build/
 
