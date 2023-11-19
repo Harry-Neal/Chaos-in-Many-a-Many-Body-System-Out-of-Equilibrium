@@ -21,7 +21,7 @@ using namespace std;
     double MCVar=	  0.25; 
     double T=         4000;
     double trel=	  100; 
-    double tau=       4;
+    double tau=       0.5;
     int    Runs=      100;
 
   //0.02 Numerical constants 

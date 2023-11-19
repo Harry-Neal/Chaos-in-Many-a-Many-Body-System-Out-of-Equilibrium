@@ -6,5 +6,8 @@ data = np.loadtxt(f_name)
 x = data[:,0]
 y = data[:,1]
 
+
 plt.plot(x,y)
+plt.xlabel('MC time step')
+plt.ylabel('Mean Energy Density')
 plt.show()
