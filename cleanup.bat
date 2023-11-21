@@ -1,4 +1,4 @@
 @echo off
-MOVE "C:\Users\harry\OneDrive\Documents\GitHub\Chaos-in-Many-a-Many-Body-System-Out-of-Equilibrium\*.dat" "C:\Users\harry\OneDrive\Documents\GitHub\Chaos-in-Many-a-Many-Body-System-Out-of-Equilibrium\data"
+MOVE C:\Users\ppyhn1\Desktop\Chaos-in-Many-a-Many-Body-System-Out-of-Equilibrium\*.dat C:\Users\ppyhn1\Desktop\Chaos-in-Many-a-Many-Body-System-Out-of-Equilibrium\data"
 PAUSE
-DEL "C:\Users\harry\OneDrive\Documents\GitHub\Chaos-in-Many-a-Many-Body-System-Out-of-Equilibrium\*.exe"
+DEL C:\Users\ppyhn1\Desktop\Chaos-in-Many-a-Many-Body-System-Out-of-Equilibrium\*.exe"
