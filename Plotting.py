@@ -1,11 +1,13 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-f_name = "data/Av.dat" #enter file name
+f_name = "Av.dat" #enter file name
 data = np.loadtxt(f_name)
 x = data[:,0]
 y = data[:,1]
 
 
-plt.bar(x,y)
+plt.plot(x,y)
+plt.xlabel('MC time step')
+plt.ylabel('Mean Energy Density')
 plt.show()
