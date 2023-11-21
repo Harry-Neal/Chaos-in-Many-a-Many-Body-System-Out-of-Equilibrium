@@ -13,7 +13,7 @@ using namespace std;
   //0.01 Global system parameters 
     int    ssize=     20;
     double lambda=    1;
-    double Jvar=      0.001;
+    double Jvar=      0.000;
     double HField[3]= {0,0,0};
     double Beta=	  2.888; 
     double dt=        0.02;
@@ -22,7 +22,7 @@ using namespace std;
     int    MCRel= 	  5000; 
     double T=         400;
     double tau=       5;
-    int    Runs=      25;
+    int    Runs=      1;
 
   //0.02 Numerical constants 
     double Pi=3.141592653589793;

@@ -11,7 +11,7 @@ using namespace std;
 //0.0 Declare global variables 
 
   //0.01 Global system parameters 
-    int    ssize=     10;
+    int    ssize=     5;
     double lambda=    1;
     double Jvar=      0.05;
     double HField[3]= {0,0,0};
@@ -21,16 +21,16 @@ using namespace std;
     double MCVar=	  0.25; 
     double T=         4000;
     double trel=	  100; 
-    double taus[]=    {0.5,0.6,0.7,0.8,0.9,1.0,1.1,1.2,1.3,1.4,1.5};
-    int    tausSize = *(&taus + 1) - taus;
-    double tau=       taus[0];
-    int    Runs=      2;
+    double tauInit=   0.5;
+    double dtau=      0.1;
+    double tauMax=    2.0;
+    int    Runs=      100;
 
   //0.02 Numerical constants 
     double Pi=3.141592653589793;
 
 //0.1 Declare external driving function
-  double Hext(double t, int k){
+  double Hext(double t, int k, double tau){
   
     switch(k){
 	  case 0  : return  cos( (2*Pi*t)/tau );
@@ -171,12 +171,14 @@ std::clock_t c_start = std::clock();
     fprintf(Parameters,"MCVar:    	%lf  \n", MCVar);
     fprintf(Parameters,"T:     		%lf \n", T);
     fprintf(Parameters,"trel:     	%lf \n", trel);
+    fprintf(Parameters,"tauInit:    %lf \n", tauInit);
+    fprintf(Parameters,"dtau:       %lf \n", dtau);
+    fprintf(Parameters,"tauMax:     %lf \n", tauMax);
     fprintf(Parameters,"Runs:    	%i  \n", Runs);
     fclose(Parameters);
   //Open output file and 
     Output = fopen("Avg_energy.dat","w+");
-    for( int p=0; p<tausSize; p++){
-		tau = taus[p];
+    for( double tau = tauInit; tau<=tauMax; tau=tau+dtau){
 	  //3 Start iteration over trajectories (Runs) 
 		for( int u=0; u<Runs; u++){
 		
@@ -281,8 +283,8 @@ std::clock_t c_start = std::clock();
 			if(t>=trel){
 				for( int j=0; j<ssize; j++){
 					for( int k=0; k<3; k++){
-						HFieldA[j][k] = HField[k] + Hext(t-trel,k);
-						HFieldB[j][k] = HField[k] + Hext(t-trel,k);
+						HFieldA[j][k] = HField[k] + Hext(t-trel,k,tau);
+						HFieldB[j][k] = HField[k] + Hext(t-trel,k,tau);
 					}
 				}   
 			}
@@ -296,8 +298,8 @@ std::clock_t c_start = std::clock();
 		 if(t>=trel){
 			for( int j=0; j<ssize; j++){
 			  for( int k=0; k<3; k++){
-				HFieldA[j][k] = HField[k] + Hext(t-trel+dt/2,k);
-				HFieldB[j][k] = HField[k] + Hext(t-trel+dt/2,k);
+				HFieldA[j][k] = HField[k] + Hext(t-trel+dt/2,k,tau);
+				HFieldB[j][k] = HField[k] + Hext(t-trel+dt/2,k,tau);
 			  }
 			}
 		}

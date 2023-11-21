@@ -11,7 +11,7 @@ using namespace std;
 //0.0 Declare global variables 
 
   //0.01 Global system parameters 
-    int    ssize=     10;
+    int    ssize=     20;
     double lambda=    1;
     double Jvar=      0.05;
     double HField[3]= {0,0,0};
@@ -21,8 +21,8 @@ using namespace std;
     double MCVar=	  0.25; 
     double T=         4000;
     double trel=	  100; 
-    double tau=       0.5;
-    int    Runs=      10;
+    double tau=       4;
+    int    Runs=      100;
 
   //0.02 Numerical constants 
     double Pi=3.141592653589793;
