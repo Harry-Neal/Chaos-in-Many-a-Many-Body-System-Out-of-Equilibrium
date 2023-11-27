@@ -5,13 +5,15 @@
 #include <iomanip>
 #include <ctime>
 #include <random>
+#include <fstream>
+#include <string>
 
 using namespace std;
 
 //0.0 Declare global variables 
 
   //0.01 Global system parameters 
-    int    ssize=     5;
+    int    ssize=     20;
     double lambda=    1;
     double Jvar=      0.05;
     double HField[3]= {0,0,0};
@@ -21,13 +23,12 @@ using namespace std;
     double MCVar=	  0.25; 
     double T=         4000;
     double trel=	  100; 
-    double tauInit=   0.5;
-    double dtau=      0.1;
-    double tauMax=    2.0;
-    int    Runs=      100;
+    double tau;
+    int    Runs=      20;
 
   //0.02 Numerical constants 
     double Pi=3.141592653589793;
+
 
 //0.1 Declare external driving function
   double Hext(double t, int k, double tau){
@@ -114,7 +115,10 @@ using namespace std;
   }
 	    
 int main(){ 
-
+ifstream MyReadFile("tau.txt");
+string myText;
+getline (MyReadFile, myText);
+tau = std::stod(myText);
 std::clock_t c_start = std::clock(); 
 	
   //1 Declare variables
@@ -171,186 +175,182 @@ std::clock_t c_start = std::clock();
     fprintf(Parameters,"MCVar:    	%lf  \n", MCVar);
     fprintf(Parameters,"T:     		%lf \n", T);
     fprintf(Parameters,"trel:     	%lf \n", trel);
-    fprintf(Parameters,"tauInit:    %lf \n", tauInit);
-    fprintf(Parameters,"dtau:       %lf \n", dtau);
-    fprintf(Parameters,"tauMax:     %lf \n", tauMax);
-    fprintf(Parameters,"Runs:    	%i  \n", Runs);
     fclose(Parameters);
   //Open output file and 
     Output = fopen("Avg_energy.dat","w+");
-    for( double tau = tauInit; tau<=tauMax; tau=tau+dtau){
-	  //3 Start iteration over trajectories (Runs) 
-		for( int u=0; u<Runs; u++){
-		
-	  //4 Initialize system variables 
-		//4.1 Initialize magnetic field with time independent external field  
-		for( int j=0; j<ssize; j++){
-			for( int k=0; k<3; k++){
-			  HFieldA[j][k] = HField[k];
-			  HFieldB[j][k] = HField[k];
-			}
+  //3 Start iteration over trajectories (Runs) 
+	for( int u=0; u<Runs; u++){
+	
+  //4 Initialize system variables 
+	//4.1 Initialize magnetic field with time independent external field  
+	for( int j=0; j<ssize; j++){
+		for( int k=0; k<3; k++){
+		  HFieldA[j][k] = HField[k];
+		  HFieldB[j][k] = HField[k];
+		}
+	  }
+	  
+	//4.2 Initialize fluctuating coupling constants  
+	for( int j=0; j<ssize; j++){
+		for( int k=0; k<3; k++){
+		  if(k!=2){		  
+			JCplA[j][k] = 1 + Jdist(e2);
+			JCplB[j][k] = 1 + Jdist(e2);        
+		  }else{
+			JCplA[j][k] = lambda + Jdist(e2);
+			JCplB[j][k] = lambda + Jdist(e2);
 		  }
-		  
-		//4.2 Initialize fluctuating coupling constants  
-		for( int j=0; j<ssize; j++){
-			for( int k=0; k<3; k++){
-			  if(k!=2){		  
-				JCplA[j][k] = 1 + Jdist(e2);
-				JCplB[j][k] = 1 + Jdist(e2);        
-			  }else{
-				JCplA[j][k] = lambda + Jdist(e2);
-				JCplB[j][k] = lambda + Jdist(e2);
-			  }
-			}
-		  }  
-		  
-		//4.3 Initialize spin vectors
-		//4.3.1 Initialize random configuration (infinite temperature)
-		for( int j=0; j<ssize; j++){
-			theta 		= 2*Pi*MCRxdist(e2);
-			phi   		= acos(1-2*MCRxdist(e2)); 
-			SpinA[j][0] = sin(phi)*cos(theta);
-			SpinA[j][1] = sin(phi)*sin(theta); 
-			SpinA[j][2] = cos(phi);
-			
-			theta 		= 2*Pi*MCRxdist(e2);
-			phi   		= acos(1-2*MCRxdist(e2)); 
-			SpinB[j][0] = sin(phi)*cos(theta);
-			SpinB[j][1] = sin(phi)*sin(theta); 
-			SpinB[j][2] = cos(phi);
+		}
+	  }  
+	  
+	//4.3 Initialize spin vectors
+	//4.3.1 Initialize random configuration (infinite temperature)
+	for( int j=0; j<ssize; j++){
+		theta 		= 2*Pi*MCRxdist(e2);
+		phi   		= acos(1-2*MCRxdist(e2)); 
+		SpinA[j][0] = sin(phi)*cos(theta);
+		SpinA[j][1] = sin(phi)*sin(theta); 
+		SpinA[j][2] = cos(phi);
+		
+		theta 		= 2*Pi*MCRxdist(e2);
+		phi   		= acos(1-2*MCRxdist(e2)); 
+		SpinB[j][0] = sin(phi)*cos(theta);
+		SpinB[j][1] = sin(phi)*sin(theta); 
+		SpinB[j][2] = cos(phi);
+	}
+	
+	//4.3.2 MC sampling of thermal state at inverse temperature Beta 
+	for( int n=0; n<MCSmp+1; n++){
+	
+	//4.3.2.1 Take initial energy, write output and copy spin config 
+	MCEi = Esys(SpinA, SpinB, HFieldA, HFieldB, JCplA, JCplB);
+	
+	for( int j=0; j<ssize; j++){
+		for( int k=0; k<3; k++){
+			MCSpinA[j][k] = SpinA[j][k]; 
+			MCSpinB[j][k] = SpinB[j][k]; 
+		}
+	}
+	
+	//4.3.2.2.Perform random change of spin config 
+	for( int j=0; j<ssize; j++){
+		theta 		= 2*Pi*MCRxdist(e2);
+		phi   		= acos(1-2*MCRxdist(e2)); 
+		MCField[0] 	= sin(phi)*cos(theta); 
+		MCField[1] 	= sin(phi)*sin(theta); 
+		MCField[2] 	= cos(phi);
+		StrthL = MCAgdist(e2); 
+		if(StrthL==0){}else{
+			for( int k=0; k<3; k++){SpinL[k] = SpinA[j][k];}
+			for( int k=0; k<3; k++){SpinA[j][k] = MRot(SpinL, MCField, StrthL, k);}
 		}
 		
-		//4.3.2 MC sampling of thermal state at inverse temperature Beta 
-		for( int n=0; n<MCSmp+1; n++){
-		
-		//4.3.2.1 Take initial energy, write output and copy spin config 
-		MCEi = Esys(SpinA, SpinB, HFieldA, HFieldB, JCplA, JCplB);
-		
-		for( int j=0; j<ssize; j++){
-			for( int k=0; k<3; k++){
-				MCSpinA[j][k] = SpinA[j][k]; 
-				MCSpinB[j][k] = SpinB[j][k]; 
-			}
+		theta 		= 2*Pi*MCRxdist(e2);
+		phi   		= acos(1-2*MCRxdist(e2)); 
+		MCField[0] 	= sin(phi)*cos(theta); 
+		MCField[1] 	= sin(phi)*sin(theta); 
+		MCField[2] 	= cos(phi);
+		StrthL = MCAgdist(e2);  
+		if(StrthL==0){}else{
+			for( int k=0; k<3; k++){SpinL[k] = SpinB[j][k];}
+			for( int k=0; k<3; k++){SpinB[j][k] = MRot(SpinL, MCField, StrthL, k);}
 		}
-		
-		//4.3.2.2.Perform random change of spin config 
-		for( int j=0; j<ssize; j++){
-			theta 		= 2*Pi*MCRxdist(e2);
-			phi   		= acos(1-2*MCRxdist(e2)); 
-			MCField[0] 	= sin(phi)*cos(theta); 
-			MCField[1] 	= sin(phi)*sin(theta); 
-			MCField[2] 	= cos(phi);
-			StrthL = MCAgdist(e2); 
-			if(StrthL==0){}else{
-				for( int k=0; k<3; k++){SpinL[k] = SpinA[j][k];}
-				for( int k=0; k<3; k++){SpinA[j][k] = MRot(SpinL, MCField, StrthL, k);}
-			}
-			
-			theta 		= 2*Pi*MCRxdist(e2);
-			phi   		= acos(1-2*MCRxdist(e2)); 
-			MCField[0] 	= sin(phi)*cos(theta); 
-			MCField[1] 	= sin(phi)*sin(theta); 
-			MCField[2] 	= cos(phi);
-			StrthL = MCAgdist(e2);  
-			if(StrthL==0){}else{
-				for( int k=0; k<3; k++){SpinL[k] = SpinB[j][k];}
-				for( int k=0; k<3; k++){SpinB[j][k] = MRot(SpinL, MCField, StrthL, k);}
-			}
-		}
-		
-		//4.3.2.3 Take final energy, check update condition, restore initial config if necessary 
-		MCEf = Esys(SpinA, SpinB, HFieldA, HFieldB, JCplA, JCplB);
-		if(MCEf > MCEi){
-			MCInd = MCRxdist(e2);
-			if(MCInd > exp(-Beta*(MCEf-MCEi))){
-				for( int j=0; j<ssize; j++){
-					for( int k=0; k<3; k++){
-						SpinA[j][k] = MCSpinA[j][k]; 
-						SpinB[j][k] = MCSpinB[j][k]; 
-					}
+	}
+	
+	//4.3.2.3 Take final energy, check update condition, restore initial config if necessary 
+	MCEf = Esys(SpinA, SpinB, HFieldA, HFieldB, JCplA, JCplB);
+	if(MCEf > MCEi){
+		MCInd = MCRxdist(e2);
+		if(MCInd > exp(-Beta*(MCEf-MCEi))){
+			for( int j=0; j<ssize; j++){
+				for( int k=0; k<3; k++){
+					SpinA[j][k] = MCSpinA[j][k]; 
+					SpinB[j][k] = MCSpinB[j][k]; 
 				}
 			}
-		}		
 		}
-		
-	  //5 Evolve spin configuration 
-	  
-		for(double t=0; t<=T; t=t+dt){
+	}		
+	}
+	
+  //5 Evolve spin configuration 
+  
+	for(double t=0; t<=T; t=t+dt){
 
-		//5.1 Set external field and evaluate observables (stroboscopically)
-		
-		if(fmod(t+dt/20,tau)<= dt/2){
-			if(t>=trel){
-				for( int j=0; j<ssize; j++){
-					for( int k=0; k<3; k++){
-						HFieldA[j][k] = HField[k] + Hext(t-trel,k,tau);
-						HFieldB[j][k] = HField[k] + Hext(t-trel,k,tau);
-					}
-				}   
-			}
-		 
-		 Usys = Esys(SpinA, SpinB, HFieldA, HFieldB, JCplA, JCplB);
-		  
-		}
-		
-									   
-		 //5.2 Update external field 
-		 if(t>=trel){
+	//5.1 Set external field and evaluate observables (stroboscopically)
+	
+	if(fmod(t+dt/20,tau)<= dt/2){
+		if(t>=trel){
 			for( int j=0; j<ssize; j++){
-			  for( int k=0; k<3; k++){
-				HFieldA[j][k] = HField[k] + Hext(t-trel+dt/2,k,tau);
-				HFieldB[j][k] = HField[k] + Hext(t-trel+dt/2,k,tau);
-			  }
-			}
+				for( int k=0; k<3; k++){
+					HFieldA[j][k] = HField[k] + Hext(t-trel,k,tau);
+					HFieldB[j][k] = HField[k] + Hext(t-trel,k,tau);
+				}
+			}   
 		}
-			
-		  //5.3 Propagate spin configuration on A 
-		  for( int j=0; j<ssize; j++){
+	 
+	 Usys = Esys(SpinA, SpinB, HFieldA, HFieldB, JCplA, JCplB);
 	  
-			for( int k=0; k<3; k++){FieldL[k] = AField(SpinB, HFieldA, JCplA, JCplB, j, k);}
-			StrthL = sqrt(pow(FieldL[0],2) + pow(FieldL[1],2) + pow(FieldL[2],2));
-		  
-			if(StrthL==0){}else{
-			for( int k=0; k<3; k++){FieldL[k] = FieldL[k]/StrthL;
-									SpinL[k] = SpinA[j][k];}
-			for( int k=0; k<3; k++){SpinA[j][k] = MRot(SpinL, FieldL, StrthL*dt/2, k);}
-			}
-		  }     
+	}
+	
+								   
+	 //5.2 Update external field 
+	 if(t>=trel){
+		for( int j=0; j<ssize; j++){
+		  for( int k=0; k<3; k++){
+			HFieldA[j][k] = HField[k] + Hext(t-trel+dt/2,k,tau);
+			HFieldB[j][k] = HField[k] + Hext(t-trel+dt/2,k,tau);
+		  }
+		}
+	}
 		
-		  //5.4 Propagate spin configuration on B
-		  for( int j=0; j<ssize; j++){
+	  //5.3 Propagate spin configuration on A 
+	  for( int j=0; j<ssize; j++){
+  
+		for( int k=0; k<3; k++){FieldL[k] = AField(SpinB, HFieldA, JCplA, JCplB, j, k);}
+		StrthL = sqrt(pow(FieldL[0],2) + pow(FieldL[1],2) + pow(FieldL[2],2));
 	  
-			for( int k=0; k<3; k++){FieldL[k] = BField(SpinA, HFieldB, JCplA, JCplB, j, k);}
-			StrthL = sqrt(pow(FieldL[0],2) + pow(FieldL[1],2) + pow(FieldL[2],2));
-			
-			if(StrthL==0){}else{
-			for( int k=0; k<3; k++){FieldL[k] = FieldL[k]/StrthL;
-									SpinL[k] = SpinB[j][k];}
-			for( int k=0; k<3; k++){SpinB[j][k] = MRot(SpinL, FieldL, StrthL*dt, k);}
-			}
-		  }
-		  
-		  //5.5 Propagate spin configuration on A 
-		  for( int j=0; j<ssize; j++){
-	  
-			for( int k=0; k<3; k++){FieldL[k] = AField(SpinB, HFieldA, JCplA, JCplB, j, k);}
-			StrthL = sqrt(pow(FieldL[0],2) + pow(FieldL[1],2) + pow(FieldL[2],2));
-		  
-			if(StrthL==0){}else{
-			for( int k=0; k<3; k++){FieldL[k] = FieldL[k]/StrthL;
-									SpinL[k] = SpinA[j][k];}
-			for( int k=0; k<3; k++){SpinA[j][k] = MRot(SpinL, FieldL, StrthL*dt/2, k);}
-			}
-		  }
+		if(StrthL==0){}else{
+		for( int k=0; k<3; k++){FieldL[k] = FieldL[k]/StrthL;
+								SpinL[k] = SpinA[j][k];}
+		for( int k=0; k<3; k++){SpinA[j][k] = MRot(SpinL, FieldL, StrthL*dt/2, k);}
+		}
+	  }     
+	
+	  //5.4 Propagate spin configuration on B
+	  for( int j=0; j<ssize; j++){
+  
+		for( int k=0; k<3; k++){FieldL[k] = BField(SpinA, HFieldB, JCplA, JCplB, j, k);}
+		StrthL = sqrt(pow(FieldL[0],2) + pow(FieldL[1],2) + pow(FieldL[2],2));
+		
+		if(StrthL==0){}else{
+		for( int k=0; k<3; k++){FieldL[k] = FieldL[k]/StrthL;
+								SpinL[k] = SpinB[j][k];}
+		for( int k=0; k<3; k++){SpinB[j][k] = MRot(SpinL, FieldL, StrthL*dt, k);}
+		}
 	  }
-	  //5.6 append current energy to total energy
-	  Utot = Utot + Usys/(2*ssize);
-}
+	  
+	  //5.5 Propagate spin configuration on A 
+	  for( int j=0; j<ssize; j++){
+  
+		for( int k=0; k<3; k++){FieldL[k] = AField(SpinB, HFieldA, JCplA, JCplB, j, k);}
+		StrthL = sqrt(pow(FieldL[0],2) + pow(FieldL[1],2) + pow(FieldL[2],2));
+	  
+		if(StrthL==0){}else{
+		for( int k=0; k<3; k++){FieldL[k] = FieldL[k]/StrthL;
+								SpinL[k] = SpinA[j][k];}
+		for( int k=0; k<3; k++){SpinA[j][k] = MRot(SpinL, FieldL, StrthL*dt/2, k);}
+		}
+	  }
+
+  }
+  //5.6 append current energy to total energy
+  Utot = Utot + Usys/(2*ssize);
+
+} 
   //6 Calculate average energy for this run and add to output
   Utot = Utot / Runs;
   fprintf(Output,"%f %lf \n", tau, Utot);
-
-} 
+  
   //7 Determine CPU time
   fclose(Output);
   std::clock_t c_end = std::clock();

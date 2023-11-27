@@ -21,7 +21,7 @@ using namespace std;
     double MCVar=	  0.25; 
     double T=         4000;
     double trel=	  100; 
-    double tau=       4;
+    double tau=       0.5;
     int    Runs=      100;
 
   //0.02 Numerical constants 
@@ -174,17 +174,18 @@ std::clock_t c_start = std::clock();
   //3 Open output file and start iteration over trajectories (Runs) 
     Output = fopen("Spin.dat","w+");
     for( int u=0; u<Runs; u++){
-    
   //4 Initialize system variables 
     //4.1 Initialize magnetic field with time independent external field  
 	for( int j=0; j<ssize; j++){
 	    for( int k=0; k<3; k++){
+			
 		  HFieldA[j][k] = HField[k];
 		  HFieldB[j][k] = HField[k];
 		}
 	  }
 	  
     //4.2 Initialize fluctuating coupling constants  
+    
     for( int j=0; j<ssize; j++){
 		for( int k=0; k<3; k++){
 	      if(k!=2){		  
@@ -196,7 +197,7 @@ std::clock_t c_start = std::clock();
 	      }
 	    }
 	  }  
-	  
+	 
     //4.3 Initialize spin vectors
     //4.3.1 Initialize random configuration (infinite temperature)
     for( int j=0; j<ssize; j++){
@@ -335,9 +336,8 @@ std::clock_t c_start = std::clock();
         for( int k=0; k<3; k++){SpinA[j][k] = MRot(SpinL, FieldL, StrthL*dt/2, k);}
 	    }
       }
+  
   }
-	
-	
 }
   fclose(Output);
   
