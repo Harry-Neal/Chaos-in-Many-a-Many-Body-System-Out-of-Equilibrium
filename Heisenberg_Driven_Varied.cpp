@@ -24,7 +24,7 @@ using namespace std;
     double T=         4000;
     double trel=	  100; 
     double tau;
-    int    Runs=      20;
+    int    Runs=      100;
 
   //0.02 Numerical constants 
     double Pi=3.141592653589793;
