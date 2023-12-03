@@ -15,7 +15,7 @@ using namespace std;
   //0.01 Global system parameters 
     int    ssize=    10;
     double lambda=    1;
-    double Jvar=      0.5;
+    double Jvar=      0.1;
     double HField[3]= {0,0,0};
     double Beta=	  2.888; 
     double dt=        0.02;
