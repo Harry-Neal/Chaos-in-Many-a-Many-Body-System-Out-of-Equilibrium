@@ -15,7 +15,7 @@ using namespace std;
   //0.01 Global system parameters 
     int    ssize=    10;
     double lambda=    1;
-    double Jvar=      0.1;
+    double Jvar=      0.05;
     double HField[3]= {0,0,0};
     double Beta=	  2.888; 
     double dt=        0.02;
@@ -349,7 +349,7 @@ std::clock_t c_start = std::clock();
 } 
   //6 Calculate average energy for this run and add to output
   Utot = Utot / Runs;
-  fprintf(Output,"%f %lf \n", tau, Utot);
+  fprintf(Output,"%f %lf", tau, Utot);
   
   //7 Determine CPU time
   fclose(Output);
