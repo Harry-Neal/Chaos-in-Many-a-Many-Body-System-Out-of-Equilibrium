@@ -13,7 +13,7 @@ using namespace std;
 //0.0 Declare global variables 
 
   //0.01 Global system parameters 
-    int    ssize=     10;
+    int    ssize=     200;
     double lambda=    1;
     double Jvar=      0.05;
     double HField[3]= {0,0,0};
@@ -21,10 +21,10 @@ using namespace std;
     double dt=        0.02;
     int	   MCSmp=	  2500;
     double MCVar=	  0.25; 
-    double T=         4000;
+    double T=         400;
     double trel=	  100; 
-    double tau =      1.5;
-    int    Runs=      1;
+    double tau =      1;
+    int    Runs=      100;
 
   //0.02 Numerical constants 
     double Pi=3.141592653589793;
@@ -320,7 +320,7 @@ int main(){
 		corr[2*j+1] = corrB[j];
 	}
 	for( int j=0; j<2*ssize; j++){
-	 	fprintf(Output,"%lf %i %lf \n", t/tau, j, corr[j]); 
+	 	fprintf(Output,"%lf	%i	%lf\n", t/tau, j, corr[j]); 
 	}
 	}
 	
