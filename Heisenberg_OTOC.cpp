@@ -7,6 +7,7 @@
 #include <random>
 #include <fstream>
 #include <string>
+#include <cstdlib>
 
 using namespace std;
 
@@ -23,8 +24,8 @@ using namespace std;
     double MCVar=	  0.25; 
     double T=         4000;
     double trel=	  100; 
-    double tau =      1.5;
-    int    Runs=      1;
+    double tau =      1;
+    int    Runs=      50;
 
   //0.02 Numerical constants 
     double Pi=3.141592653589793;
@@ -179,6 +180,12 @@ int main(){
     fclose(Parameters);
   //Open output file and 
     Output = fopen("OTOC.dat","w+");
+
+	int maxtime = int(round(T/tau));
+	double corrA[ssize];
+	double corrB[ssize];
+	long double corr[2*ssize][Runs][maxtime];
+
   //3 Start iteration over trajectories (Runs) 
 	for( int u=0; u<Runs; u++){
 	
@@ -282,22 +289,16 @@ int main(){
 			SpinB2[j][k] = SpinB[j][k];
 		}
 	}
-	theta 		= 0.05;
-	phi   		= 0; 
-	MCField[0] 	= sin(phi)*cos(theta); 
-	MCField[1] 	= sin(phi)*sin(theta); 
-	MCField[2] 	= cos(phi);
+	StrthL = 	0.05;
+	MCField[0] 	= 0; 
+	MCField[1] 	= 0; 
+	MCField[2] 	= 1;
 	for( int k=0; k<3; k++){SpinL[k] = SpinA2[0][k];}
 	for( int k=0; k<3; k++){SpinA2[0][k] = MRot(SpinL, MCField, StrthL, k);}
-
-	double corrA[ssize];
-	double corrB[ssize];
-	double corr[2*ssize];
 
   	//5 Evolve spin configuration 
 
 	for(double t=0; t<=T; t=t+dt){
-
 	//5.1 Set external field and evaluate observables (stroboscopically)
 	
 	if(fmod(t+dt/20,tau)<= dt/2){
@@ -316,15 +317,12 @@ int main(){
 		}
 		
 	for( int j=0; j<ssize; j++){
-		corr[2*j]   = corrA[j];
-		corr[2*j+1] = corrB[j];
+		corr[2*j][u][int(t/tau)]  = corrA[j];
+		corr[2*j+1][u][int(t/tau)] = corrB[j];
 	}
-	for( int j=0; j<2*ssize; j++){
-	 	fprintf(Output,"%lf %i %lf \n", t/tau, j, corr[j]); 
+
 	}
-	}
-	
-								   
+							   
 	 //5.2 Update external field 
 	 if(t>=trel){
 		for( int j=0; j<ssize; j++){
@@ -374,10 +372,7 @@ int main(){
 		}
 	  }
 
-
-
-
-	  //5.3 Propagate spin configuration on A2
+	  //5.6 Propagate spin configuration on A2
 	  for( int j=0; j<ssize; j++){
   
 		for( int k=0; k<3; k++){FieldL[k] = AField(SpinB2, HFieldA, JCplA, JCplB, j, k);}
@@ -390,7 +385,7 @@ int main(){
 		}
 	  }     
 	
-	  //5.4 Propagate spin configuration on B2
+	  //5.7 Propagate spin configuration on B2
 	  for( int j=0; j<ssize; j++){
   
 		for( int k=0; k<3; k++){FieldL[k] = BField(SpinA2, HFieldB, JCplA, JCplB, j, k);}
@@ -403,7 +398,7 @@ int main(){
 		}
 	  }
 	  
-	  //5.5 Propagate spin configuration on A2
+	  //5.8 Propagate spin configuration on A2
 	  for( int j=0; j<ssize; j++){
   
 		for( int k=0; k<3; k++){FieldL[k] = AField(SpinB2, HFieldA, JCplA, JCplB, j, k);}
@@ -418,8 +413,25 @@ int main(){
 
   }
 	
-} 
+}
+double corravg[ssize][int(T/tau)];
 
+for(int j=0; j<2*ssize; j++){
+	for (double t=0; t<=T; t=t+dt){
+		double sum = 0;
+		for ( int u=0; u<Runs; u++){
+			sum = sum + corr[j][u][int(t/tau)];
+			}
+		sum = sum/Runs;
+		corravg[j][int(t/tau)] = sum;
+		}
+	}
+
+for (double t=0; t<=T; t=t+dt){
+	for(int j=0; j<2*ssize; j++){
+		fprintf(Output,"%lf %i %lf \n", t/tau, j, corravg[j][int(t/tau)]); 
+		}
+	}
   //7 Determine CPU time
   fclose(Output);
   std::clock_t c_end = std::clock();
