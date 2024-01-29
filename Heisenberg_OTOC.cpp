@@ -25,6 +25,7 @@ using namespace std;
     double trel=	  100; 
     double tau =      1;
     int    Runs=      200;
+	double epsilon=	  0.05:
 
   //0.02 Numerical constants 
     double Pi=3.141592653589793;
@@ -282,7 +283,7 @@ int main(){
 			SpinB2[j][k] = SpinB[j][k];
 		}
 	}
-	theta 		= 0.05;
+	theta 		= epsilon;
 	phi   		= 0; 
 	MCField[0] 	= sin(phi)*cos(theta); 
 	MCField[1] 	= sin(phi)*sin(theta); 
