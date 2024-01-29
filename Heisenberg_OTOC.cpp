@@ -13,7 +13,7 @@ using namespace std;
 //0.0 Declare global variables 
 
   //0.01 Global system parameters 
-    int    ssize=     500;
+    int    ssize=     250;
     double lambda=    1;
     double Jvar=      0.05;
     double HField[3]= {0,0,0};
@@ -24,8 +24,8 @@ using namespace std;
     double T=         400;
     double trel=	  100; 
     double tau =      1;
-    int    Runs=      200;
-	double epsilon=	  0.05:
+    int    Runs=      100;
+	double epsilon=	  0.05;
 
   //0.02 Numerical constants 
     double Pi=3.141592653589793;
@@ -115,7 +115,12 @@ using namespace std;
 	return MInc;
   }
 
-
+//0.7 Declare cross product function
+  void crossProduct(double v_A[], double v_B[], double c_P[]) {
+   c_P[0] = v_A[1] * v_B[2] - v_A[2] * v_B[1];
+   c_P[1] = -(v_A[0] * v_B[2] - v_A[2] * v_B[0]);
+   c_P[2] = v_A[0] * v_B[1] - v_A[1] * v_B[0];
+}
 
 int main(){
 	std::clock_t c_start = std::clock();  	
@@ -159,6 +164,9 @@ int main(){
 	double MCSpinA[ssize][3]; //MC copy of Spin config on sublattice A
 	double MCSpinB[ssize][3]; //MC copy of Spin config on sublattice B
 	double MCField[3]; 		  //MC random magnetic field 
+	double z_ax[3] = {0,0,1}; //z-axis vector
+	double norm[3];			  //normal vector
+	double dS[3];			  //axis to rotate about
 	double MCEi; 			  //MC initial energy 	
 	double MCEf; 			  //MC final energy 
 	double MCInd;			  //MC update indicator 	
@@ -174,9 +182,10 @@ int main(){
     fprintf(Parameters,"Beta:  		%lf \n", Beta);
     fprintf(Parameters,"dt:       	%lf \n", dt);
     fprintf(Parameters,"MCSmp:    	%i  \n", MCSmp);
-    fprintf(Parameters,"MCVar:    	%lf  \n", MCVar);
+    fprintf(Parameters,"MCVar:    	%lf \n", MCVar);
     fprintf(Parameters,"T:     		%lf \n", T);
     fprintf(Parameters,"trel:     	%lf \n", trel);
+	fprintf(Parameters,"epsilon:    %lf \n", epsilon);
     fclose(Parameters);
   //Open output file and 
     Output = fopen("OTOC.dat","w+");
@@ -285,11 +294,12 @@ int main(){
 	}
 	theta 		= epsilon;
 	phi   		= 0; 
-	MCField[0] 	= sin(phi)*cos(theta); 
-	MCField[1] 	= sin(phi)*sin(theta); 
-	MCField[2] 	= cos(phi);
+	crossProduct(z_ax,SpinA2[0],norm);
+	for( int k=0; k<3; k++){norm[k] = norm[k]/sqrt(norm[0]*norm[0] + norm[1]*norm[1] + norm[2]*norm[2]);}
+	crossProduct(norm,SpinA2[0],dS);
+	for( int k=0; k<3; k++){dS[k] = epsilon*dS[k];}
 	for( int k=0; k<3; k++){SpinL[k] = SpinA2[0][k];}
-	for( int k=0; k<3; k++){SpinA2[0][k] = MRot(SpinL, MCField, StrthL, k);}
+	for( int k=0; k<3; k++){SpinA2[0][k] = MRot(SpinL, dS, StrthL, k);}
 
 	double corrA[ssize];
 	double corrB[ssize];
@@ -324,7 +334,6 @@ int main(){
 	 	fprintf(Output,"%lf	%i	%lf\n", t/tau, j, corr[j]); 
 	}
 	}
-	
 								   
 	 //5.2 Update external field 
 	 if(t>=trel){
