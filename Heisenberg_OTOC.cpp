@@ -13,7 +13,7 @@ using namespace std;
 //0.0 Declare global variables 
 
   //0.01 Global system parameters 
-    int    ssize=     250;
+    int    ssize=     10;
     double lambda=    1;
     double Jvar=      0.05;
     double HField[3]= {0,0,0};
@@ -21,11 +21,11 @@ using namespace std;
     double dt=        0.02;
     int	   MCSmp=	  2500;
     double MCVar=	  0.25; 
-    double T=         400;
-    double trel=	  100; 
+    double T=         200;
+    double trel=	  10; 
     double tau =      1;
-    int    Runs=      100;
-	double epsilon=	  0.05;
+    int    Runs=      1;
+    double epsilon=	  0.05;
 
   //0.02 Numerical constants 
     double Pi=3.141592653589793;
@@ -166,7 +166,16 @@ int main(){
 	double MCField[3]; 		  //MC random magnetic field 
 	double z_ax[3] = {0,0,1}; //z-axis vector
 	double norm[3];			  //normal vector
-	double dS[3];			  //axis to rotate about
+
+	int max_t = 0;
+	for(double t=0; t<=T; t=t+dt){
+		if(fmod(t+dt/20,tau)<= dt/2){
+			max_t = max_t  + 1;
+		}
+	}
+	double corrA[ssize];	  //correlator for copy A
+	double corrB[ssize];	  //correlator for copy B
+	double corr[2*ssize][max_t];//correlator for both coppies at given t
 	double MCEi; 			  //MC initial energy 	
 	double MCEf; 			  //MC final energy 
 	double MCInd;			  //MC update indicator 	
@@ -189,6 +198,7 @@ int main(){
     fclose(Parameters);
   //Open output file and 
     Output = fopen("OTOC.dat","w+");
+
   //3 Start iteration over trajectories (Runs) 
 	for( int u=0; u<Runs; u++){
 	
@@ -282,7 +292,7 @@ int main(){
 		}
 	}		
 	}
-	//4.4 Duplicate spins and make small change to one configuration
+	//4.4 Duplicate spins 
 	for( int j=0; j<ssize; j++){
 		for( int k=0; k<3; k++){
 			SpinA1[j][k] = SpinA[j][k];
@@ -292,25 +302,19 @@ int main(){
 			SpinB2[j][k] = SpinB[j][k];
 		}
 	}
+	// 4.5 make small change to one configuration
 	theta 		= epsilon;
 	phi   		= 0; 
 	crossProduct(z_ax,SpinA2[0],norm);
 	for( int k=0; k<3; k++){norm[k] = norm[k]/sqrt(norm[0]*norm[0] + norm[1]*norm[1] + norm[2]*norm[2]);}
-	crossProduct(norm,SpinA2[0],dS);
-	for( int k=0; k<3; k++){dS[k] = epsilon*dS[k];}
 	for( int k=0; k<3; k++){SpinL[k] = SpinA2[0][k];}
-	for( int k=0; k<3; k++){SpinA2[0][k] = MRot(SpinL, dS, StrthL, k);}
+	for( int k=0; k<3; k++){SpinA2[0][k] = MRot(SpinL, norm, StrthL, k);}
 
-	double corrA[ssize];
-	double corrB[ssize];
-	double corr[2*ssize];
-
+	int t_step = 0;
   	//5 Evolve spin configuration 
-
 	for(double t=0; t<=T; t=t+dt){
 
 	//5.1 Set external field and evaluate observables (stroboscopically)
-	
 	if(fmod(t+dt/20,tau)<= dt/2){
 		if(t>=trel){
 			for( int j=0; j<ssize; j++){
@@ -320,19 +324,15 @@ int main(){
 				}
 			}   
 		}
-
+	//evaluate correlators for each position in chain
   	for( int j=0; j<ssize; j++){
 		corrA[j] = 1 - (SpinA1[j][0]*SpinA2[j][0] + SpinA1[j][1]*SpinA2[j][1] + SpinA1[j][2]*SpinA2[j][2]);
+		corr[2*j][t_step] = corr[2*j][t_step] + corrA[j];
+
 		corrB[j] = 1 - (SpinB1[j][0]*SpinB2[j][0] + SpinB1[j][1]*SpinB2[j][1] + SpinB1[j][2]*SpinB2[j][2]);
+		corr[2*j+1][t_step] = corr[2*j+1][t_step] + corrB[j];
 		}
-		
-	for( int j=0; j<ssize; j++){
-		corr[2*j]   = corrA[j];
-		corr[2*j+1] = corrB[j];
-	}
-	for( int j=0; j<2*ssize; j++){
-	 	fprintf(Output,"%lf	%i	%lf\n", t/tau, j, corr[j]); 
-	}
+	t_step = t_step + 1;
 	}
 								   
 	 //5.2 Update external field 
@@ -344,7 +344,7 @@ int main(){
 		  }
 		}
 	}
-		
+	//Propogate copy 1
 	  //5.3 Propagate spin configuration on A1
 	  for( int j=0; j<ssize; j++){
   
@@ -384,9 +384,7 @@ int main(){
 		}
 	  }
 
-
-
-
+	//Propogate copy 2
 	  //5.3 Propagate spin configuration on A2
 	  for( int j=0; j<ssize; j++){
   
@@ -426,12 +424,19 @@ int main(){
 		}
 	  }
 
-  }
-	
-} 
+     }
+}
 
-  //7 Determine CPU time
+  for(int time = 0; time<max_t; time++){
+    for(int pos = 0; pos<2*ssize; pos++){
+	  corr[pos][time] = corr[pos][time]/Runs;
+	  fprintf(Output, "%lf	", corr[pos][time]);
+	  }
+	fprintf(Output,  "\n");
+	}
   fclose(Output);
+  
+  //7 Determine CPU time
   std::clock_t c_end = std::clock();
   double time_elapsed_ms = 1000.0*(c_end-c_start)/CLOCKS_PER_SEC;
   std::cout << "CPU time used: " << time_elapsed_ms/1000 << " s\n";
