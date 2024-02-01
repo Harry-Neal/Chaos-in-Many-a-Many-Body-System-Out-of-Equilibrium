@@ -13,7 +13,7 @@ using namespace std;
 //0.0 Declare global variables 
 
   //0.01 Global system parameters 
-    int    ssize=     10;
+    int    ssize=     250;
     double lambda=    1;
     double Jvar=      0.05;
     double HField[3]= {0,0,0};
@@ -21,10 +21,10 @@ using namespace std;
     double dt=        0.02;
     int	   MCSmp=	  2500;
     double MCVar=	  0.25; 
-    double T=         200;
+    double T=         175;
     double trel=	  10; 
     double tau =      1;
-    int    Runs=      1;
+    int    Runs=      2000;
     double epsilon=	  0.05;
 
   //0.02 Numerical constants 
@@ -193,6 +193,8 @@ int main(){
     fprintf(Parameters,"MCSmp:    	%i  \n", MCSmp);
     fprintf(Parameters,"MCVar:    	%lf \n", MCVar);
     fprintf(Parameters,"T:     		%lf \n", T);
+	fprintf(Parameters,"Runs:     	%i \n", Runs);
+	fprintf(Parameters,"Tau:     	%lf \n", tau);
     fprintf(Parameters,"trel:     	%lf \n", trel);
 	fprintf(Parameters,"epsilon:    %lf \n", epsilon);
     fclose(Parameters);

@@ -1,13 +1,21 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import scipy as scpy
+import re
 
-OTOC = np.loadtxt('OTOC_avg.dat')
-params = np.loadtxt('plotting_params_OTOC.dat')
+OTOC = np.loadtxt('OTOC.dat')
+
+with open('Parameters.dat') as f:
+    params = f.read()
+
+parameters = (re.findall(r'\w+', params))
+for i in range(len(parameters)):
+   if parameters[i] == 'Tau':
+        dt = eval(parameters[i+1]+'.'+parameters[i+2])
 
 t_max,x_max = np.shape(OTOC)
 x = np.arange(0,x_max,1)
-t = np.arange(0,t_max,params[1])
+t = np.arange(0,t_max,dt)
 
 fig = plt.figure()
 ax2 = plt.axes([0.1,0.1,0.9,0.9])
@@ -31,22 +39,23 @@ for time in times:
    ax2.plot(x[1:200]/time , y[t_sample,:]/(2*time),label=f't={time}')
 
 
-x2=np.arange(0,1.75,0.1)
+x2=np.arange(0,1.9,0.1)
 ax2.plot(x2,f(x2,1.642,0.494),color = 'black', linestyle = '--')
 
 ax2.set_xlabel('x/t')
 ax2.set_ylabel('$ln(D(x,t)/ \epsilon^2 )/2t$')
 ax2.legend()
 
-# OTOC = np.roll(OTOC,x_max//2,axis=1)
-# x = np.arange(-x_max//2,x_max//2,1)
-# fig,ax3 = plt.subplots(1)
-# plt.imshow(OTOC,extent=[min(x), max(x), min(t), max(t)],origin='lower',cmap='bwr')
-# ax3.set_aspect('equal')
-# ax3.set_xlabel('x')
-# ax3.set_ylabel('t')
-# ax3.plot(x,(1/1.6417)*np.abs(x)+5,'black')
-# cax = plt.axes((0.85, 0.1, 0.05, 0.8))
-# plt.colorbar(cax=cax)
-# cax.set_ylabel('D(x,t)')
+OTOC = np.roll(OTOC,x_max//2,axis=1)
+x = np.arange(-x_max//2,x_max//2,1)
+fig =plt.figure()
+ax3 = plt.axes([0.1,0.1,0.7,0.8])
+plt.imshow(OTOC,extent=[min(x), max(x), min(t), max(t)],origin='lower',cmap='bwr')
+ax3.set_aspect('equal')
+ax3.set_xlabel('x')
+ax3.set_ylabel('t')
+ax3.plot(x,(1/1.6417)*np.abs(x)+5,'black')
+cax = plt.axes((0.85, 0.1, 0.05, 0.8))
+plt.colorbar(cax=cax)
+cax.set_ylabel('D(x,t)')
 plt.show()

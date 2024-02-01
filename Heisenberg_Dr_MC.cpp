@@ -11,7 +11,7 @@ using namespace std;
 //0.0 Declare global variables 
 
   //0.01 Global system parameters 
-    int    ssize=     50;
+    int    ssize=     250;
     double lambda=    1;
     double Jvar=      0.001;
     double HField[3]= {0,0,0};
