@@ -13,7 +13,7 @@ using namespace std;
 //0.0 Declare global variables 
 
   //0.01 Global system parameters 
-    int    ssize=     100;
+    int    ssize=     50;
     double lambda=    1;
     double Jvar=      0.05;
     double HField[3]= {0,0,0};
@@ -24,11 +24,12 @@ using namespace std;
     double T=         175;
     double trel=	  10; 
     double tau =      1;
-    int    Runs=      200;
+    int    Runs=      500;
     double epsilon=	  0.05;
 
   //0.02 Numerical constants 
     double Pi=3.141592653589793;
+
 
 //0.1 Declare external driving function
   double Hext(double t, int k, double tau){
@@ -192,8 +193,8 @@ int main(){
     fprintf(Parameters,"MCSmp:    	%i  \n", MCSmp);
     fprintf(Parameters,"MCVar:    	%lf \n", MCVar);
     fprintf(Parameters,"T:     		%lf \n", T);
-	fprintf(Parameters,"Runs:     	%i \n", Runs);
-	fprintf(Parameters,"Tau:     	%lf \n", tau);
+	fprintf(Parameters,"Runs:     	%i \n",  Runs);
+	fprintf(Parameters,"tau:     	%lf \n", tau);
     fprintf(Parameters,"trel:     	%lf \n", trel);
 	fprintf(Parameters,"epsilon:    %lf \n", epsilon);
     fclose(Parameters);
@@ -202,7 +203,7 @@ int main(){
 
   //3 Start iteration over trajectories (Runs) 
 	for( int u=0; u<Runs; u++){
-	
+	std::cout << "Run " << u <<" out of " << Runs <<" \n";
   //4 Initialize system variables 
 	//4.1 Initialize magnetic field with time independent external field  
 	for( int j=0; j<ssize; j++){
@@ -303,7 +304,7 @@ int main(){
 			SpinB2[j][k] = SpinB[j][k];
 		}
 	}
-	// 4.5 make small change to one configuration
+	// 4.5 make small change to one configuration by rotating about an axis norm = Z x S_0 by an angle theta = epsilon
 	theta 		= epsilon;
 	phi   		= 0; 
 	crossProduct(z_ax,SpinA2[0],norm);
@@ -311,8 +312,8 @@ int main(){
 	for( int k=0; k<3; k++){SpinL[k] = SpinA2[0][k];}
 	for( int k=0; k<3; k++){SpinA2[0][k] = MRot(SpinL, norm, StrthL, k);}
 
-	int t_step = 0;
   	//5 Evolve spin configuration 
+	int t_step = 0;
 	for(double t=0; t<=T; t=t+dt){
 
 	//5.1 Set external field and evaluate observables (stroboscopically)
@@ -320,19 +321,25 @@ int main(){
 		if(t>=trel){
 			for( int j=0; j<ssize; j++){
 				for( int k=0; k<3; k++){
+					// Driving terms are commented out
 					HFieldA[j][k] = HField[k]; //+ Hext(t-trel,k,tau);
 					HFieldB[j][k] = HField[k]; //+ Hext(t-trel,k,tau);
 				}
 			}   
 		}
-	//5.3 evaluate correlators for each position in chain
+	//5.2 evaluate correlators for each position in chain
   	for( int j=0; j<ssize; j++){
+		//5.2.1 evaluate correlators at each even position (sublattice A) at time t
 		corrA[j] = 1 - (SpinA1[j][0]*SpinA2[j][0] + SpinA1[j][1]*SpinA2[j][1] + SpinA1[j][2]*SpinA2[j][2]);
+		//5.2.2 append them to the total correlator array at even positions 2*j
 		corr[2*j][t_step] = corr[2*j][t_step] + corrA[j];
 
+		//5.2.3 evaluate correlators at each odd position (sublattice B)
 		corrB[j] = 1 - (SpinB1[j][0]*SpinB2[j][0] + SpinB1[j][1]*SpinB2[j][1] + SpinB1[j][2]*SpinB2[j][2]);
+		//5.2.4 append them to the total correlator array odd positions 2*j +1
 		corr[2*j+1][t_step] = corr[2*j+1][t_step] + corrB[j];
 		}
+	//5.2.5 increment time step
 	t_step = t_step + 1;
 	}
 								   
@@ -340,13 +347,13 @@ int main(){
 	 if(t>=trel){
 		for( int j=0; j<ssize; j++){
 		  for( int k=0; k<3; k++){
+			// Driving terms are commented out
 			HFieldA[j][k] = HField[k]; //+ Hext(t-trel+dt/2,k,tau);
 			HFieldB[j][k] = HField[k]; //+ Hext(t-trel+dt/2,k,tau);
 		  }
 		}
 	}
-
-	//5.4 Propogate copy 1
+	//5.4 Propogate copy 1 using Suzuki-Troter decomposition
 	  //5.4.1 Propagate spin configuration on A1
 	  for( int j=0; j<ssize; j++){
   
@@ -386,7 +393,7 @@ int main(){
 		}
 	  }
 
-	//5.5 Propogate copy 2
+	//5.5 Propogate copy 2 using Suzuki-Troter decomposition
 	  //5.5.1 Propagate spin configuration on A2
 	  for( int j=0; j<ssize; j++){
   
@@ -428,23 +435,22 @@ int main(){
 
      }
 }
+  //6 Output correlator to file
 
-  //7 Output normalised OTOC to output file
-
-  //7.1 loop over times and positions of OTOC data collected
+  //6.1 loop over times and positions
   for(int time = 0; time<max_t; time++){
     for(int pos = 0; pos<2*ssize; pos++){
-	  //7.2 Normalise each entry by dividing by Runs
+	  //6.2 average correlator by dividing by number of runs 
 	  corr[pos][time] = corr[pos][time]/Runs;
-	  // 7.3 Output entry data to file
+	  //6.3 Output to file
 	  fprintf(Output, "%lf	", corr[pos][time]);
 	  }
-	// 7.4 add a new line after each row of positions at a given time
+	//6.4 create newline in output for next time step
 	fprintf(Output,  "\n");
 	}
   fclose(Output);
   
-  //8 Determine CPU time
+  //7 Determine CPU time
   std::clock_t c_end = std::clock();
   double time_elapsed_ms = 1000.0*(c_end-c_start)/CLOCKS_PER_SEC;
   std::cout << "CPU time used: " << time_elapsed_ms/1000 << " s\n";
