@@ -4,7 +4,7 @@ import scipy as scpy
 import re
 
 #read OTOC data
-OTOC = np.loadtxt('OTOC.dat')
+OTOC = np.loadtxt('OTOC_Dr.dat')
 
 #read parameters file
 with open('Parameters.dat') as f:
@@ -17,11 +17,14 @@ for i in range(len(parameters)):
       dt = eval(parameters[i+1]+'.'+parameters[i+2])
    if parameters[i] =='epsilon':
       epsilon = eval(parameters[i+1]+'.'+parameters[i+2])
+   if parameters[i] == 'T':
+      T = eval(parameters[i+1]+'.'+parameters[i+2])
 
 #declare range for OTOC data
 t_max,x_max = np.shape(OTOC)
 x = np.arange(0,x_max,1)
-t = np.arange(0,t_max,dt)
+t = np.arange(0,T,dt)
+
 
 #=============FIRST FIGURE===============
 #=========CAN IGNORE FOR NOW============
@@ -71,12 +74,13 @@ ax3.set_aspect('equal')
 ax3.set_xlabel('x')
 ax3.set_ylabel('t')
 
-#plot light cone fit with v_b=1.16417
-ax3.plot(x,(1/1.6417)*np.abs(x)+5,'black')
-
+#plot light cone fit with 
+v_b = 1.53
+ax3.plot(x,(1/v_b)*np.abs(x)+5,'black',label=f"t=|x|/{v_b}")
+ax3.set_ylim(( min(t), max(t)))
 #add color bar
 cax = plt.axes((0.85, 0.1, 0.05, 0.8))
 plt.colorbar(cax=cax)
 cax.set_ylabel('D(x,t)')
-
+ax3.legend()
 plt.show()
