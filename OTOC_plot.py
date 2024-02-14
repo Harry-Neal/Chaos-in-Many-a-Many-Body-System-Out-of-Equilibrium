@@ -14,7 +14,7 @@ with open('Parameters.dat') as f:
 parameters = (re.findall(r'\w+', params))
 for i in range(len(parameters)):
    if parameters[i] == 'tau':
-      dt = eval(parameters[i+1]+'.'+parameters[i+2])
+      tau = eval(parameters[i+1]+'.'+parameters[i+2])
    if parameters[i] =='epsilon':
       epsilon = eval(parameters[i+1]+'.'+parameters[i+2])
    if parameters[i] == 'T':
@@ -23,8 +23,7 @@ for i in range(len(parameters)):
 #declare range for OTOC data
 t_max,x_max = np.shape(OTOC)
 x = np.arange(0,x_max,1)
-t = np.arange(0,T,dt)
-
+t = np.arange(0,T/tau,1)
 
 #=============FIRST FIGURE===============
 #=========CAN IGNORE FOR NOW============
@@ -72,11 +71,11 @@ plt.imshow(OTOC,extent=[min(x), max(x), min(t), max(t)],origin='lower',cmap='bwr
 #set aspect and labels
 ax3.set_aspect('equal')
 ax3.set_xlabel('x')
-ax3.set_ylabel('t')
+ax3.set_ylabel('$t/ \\tau$')
 
 #plot light cone fit with 
 v_b = 1.53
-ax3.plot(x,(1/v_b)*np.abs(x)+5,'black',label=f"t=|x|/{v_b}")
+ax3.plot(x,(1/v_b)*np.abs(x),'black',label=f"t=|x|/{v_b}")
 ax3.set_ylim(( min(t), max(t)))
 #add color bar
 cax = plt.axes((0.85, 0.1, 0.05, 0.8))

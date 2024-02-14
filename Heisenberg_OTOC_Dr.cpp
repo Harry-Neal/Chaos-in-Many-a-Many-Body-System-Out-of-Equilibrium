@@ -23,10 +23,10 @@ using namespace std;
     double MCVar=	  0.25; 
     double T=         200;
     double trel=	  100; 
-    double tau =      0.25;
+    double tau =      2;
     int    Runs=      500;
     double epsilon=	  0.01;
-	double T_init= 	  200;
+	double T_init= 	  100*tau;
 
   //0.02 Numerical constants 
     double Pi=3.141592653589793;
@@ -129,6 +129,7 @@ int main(){
   
     //1.1 Files
     FILE *Output;
+	FILE *Energy_out;
     FILE *Parameters;
     
     //1.2 Declare random number generator and distributions 
@@ -200,7 +201,7 @@ int main(){
 	fprintf(Parameters,"epsilon:    %lf \n", epsilon);
     fclose(Parameters);
   //Open output file and 
-    Output = fopen("OTOC_Dr.dat","w+");
+	Energy_out = fopen("spin.dat","w+");
 
   //3 Start iteration over trajectories (Runs) 
 	for( int u=0; u<Runs; u++){
@@ -308,7 +309,8 @@ int main(){
 				}
 			}   
 		}
-	 
+	Usys = Esys(SpinA, SpinB, HFieldA, HFieldB, JCplA, JCplB);
+	fprintf(Energy_out,"%lf %lf \n", t/tau, Usys/(2*ssize)); 
 	}
 								   
 	 //5.2 Update external field 
@@ -385,21 +387,20 @@ int main(){
 	if(fmod(t+dt/20,tau)<= dt/2){
 	for( int j=0; j<ssize; j++){
 		for( int k=0; k<3; k++){
-			// Driving terms are commented out
-			HFieldA[j][k] = HField[k]; + Hext(t,k,tau);
-			HFieldB[j][k] = HField[k]; + Hext(t,k,tau);
+			HFieldA[j][k] = HField[k]; + Hext(t+T_init-trel,k,tau);
+			HFieldB[j][k] = HField[k]; + Hext(t+T_init-trel,k,tau);
 		}
 	}   
 	
 	//7.2 evaluate correlators for each position in chain
   	for( int j=0; j<ssize; j++){
 		//7.2.1 evaluate correlators at each even position (sublattice A) at time t
-		corrA[j] = 1 - (SpinA1[j][0]*SpinA2[j][0] + SpinA1[j][1]*SpinA2[j][1] + SpinA1[j][2]*SpinA2[j][2]);
+		corrA[j] = (SpinA1[j][0]*SpinA2[j][0] + SpinA1[j][1]*SpinA2[j][1] + SpinA1[j][2]*SpinA2[j][2]);
 		//7.2.2 append them to the total correlator array at even positions 2*j
 		corr[2*j][t_step] = corr[2*j][t_step] + corrA[j];
 
 		//7.2.3 evaluate correlators at each odd position (sublattice B)
-		corrB[j] = 1 - (SpinB1[j][0]*SpinB2[j][0] + SpinB1[j][1]*SpinB2[j][1] + SpinB1[j][2]*SpinB2[j][2]);
+		corrB[j] = (SpinB1[j][0]*SpinB2[j][0] + SpinB1[j][1]*SpinB2[j][1] + SpinB1[j][2]*SpinB2[j][2]);
 		//7.2.4 append them to the total correlator array odd positions 2*j +1
 		corr[2*j+1][t_step] = corr[2*j+1][t_step] + corrB[j];
 		}
@@ -410,9 +411,8 @@ int main(){
 	//7.3 Update external field 
 	for( int j=0; j<ssize; j++){
 		for( int k=0; k<3; k++){
-		// Driving terms are commented out
-		HFieldA[j][k] = HField[k]; + Hext(t+dt/2,k,tau);
-		HFieldB[j][k] = HField[k]; + Hext(t+dt/2,k,tau);
+		HFieldA[j][k] = HField[k]; + Hext(t+T_init-trel+dt/2,k,tau);
+		HFieldB[j][k] = HField[k]; + Hext(t+T_init-trel+dt/2,k,tau);
 		}
 	}
 	//7.4 Propogate copy 1 using Suzuki-Troter decomposition
@@ -497,13 +497,14 @@ int main(){
 
      }
 	}
+  fclose(Energy_out);
   //8 Output correlator to file
-
+  Output = fopen("OTOC_Dr.dat","w+");
   //8.1 loop over times and positions
   for(int time = 0; time<max_t; time++){
     for(int pos = 0; pos<2*ssize; pos++){
 	  //8.2 average correlator by dividing by number of runs 
-	  corr[pos][time] = corr[pos][time]/Runs;
+	  corr[pos][time] = 1 - corr[pos][time]/Runs;
 	  //8.3 Output to file
 	  fprintf(Output, "%lf	", corr[pos][time]);
 	  }
