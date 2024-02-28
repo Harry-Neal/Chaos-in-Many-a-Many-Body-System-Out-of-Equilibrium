@@ -1,0 +1,15 @@
+import numpy as np
+import matplotlib.pyplot as plt
+runs = 10
+
+spin = np.loadtxt('Spin.dat')
+
+time = np.arange(np.min(spin[:,0]),np.max(spin[:,0]),1)
+E = np.zeros(len(time))
+for i in range(runs):
+    E = E + spin[0+i*len(time):len(time)+i*len(time),1]
+
+E=E/runs
+
+plt.plot(time,E)
+plt.show()

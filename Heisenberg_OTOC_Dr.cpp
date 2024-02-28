@@ -13,18 +13,18 @@ using namespace std;
 //0.0 Declare global variables 
 
   //0.01 Global system parameters 
-    int    ssize=     200;
+    int    ssize=     100;
     double lambda=    1;
     double Jvar=      0.05;
     double HField[3]= {0,0,0};
     double Beta=	  2.888; 
     double dt=        0.02;
-    int	   MCSmp=	  2500;
+    int	   MCSmp=	  5000;
     double MCVar=	  0.25; 
     double T=         200;
-    double trel=	  100; 
+    double trel=	  10; 
     double tau =      2;
-    int    Runs=      500;
+    int    Runs=      50;
     double epsilon=	  0.01;
 	double T_init= 	  100*tau;
 
@@ -201,7 +201,7 @@ int main(){
 	fprintf(Parameters,"epsilon:    %lf \n", epsilon);
     fclose(Parameters);
   //Open output file and 
-	Energy_out = fopen("spin.dat","w+");
+	Energy_out = fopen("Spin.dat","w+");
 
   //3 Start iteration over trajectories (Runs) 
 	for( int u=0; u<Runs; u++){
@@ -378,8 +378,7 @@ int main(){
 	for( int k=0; k<3; k++){norm[k] = norm[k]/sqrt(norm[0]*norm[0] + norm[1]*norm[1] + norm[2]*norm[2]);}
 	for( int k=0; k<3; k++){SpinL[k] = SpinA2[0][k];}
 	for( int k=0; k<3; k++){SpinA2[0][k] = MRot(SpinL, norm, StrthL, k);}
-
-  	//7 Evolve spin configuration 
+  	//7 Evolve spin configurations 
 	int t_step = 0;
 	for(double t=0; t<=T; t=t+dt){
 
@@ -406,6 +405,9 @@ int main(){
 		}
 	//7.2.5 increment time step
 	t_step = t_step + 1;
+
+	Usys = Esys(SpinA1, SpinB1, HFieldA, HFieldB, JCplA, JCplB);
+	fprintf(Energy_out,"%lf %lf \n", t/tau + T_init/tau, Usys/(2*ssize)); 
 	}
 								   
 	//7.3 Update external field 

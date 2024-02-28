@@ -10,7 +10,7 @@
 using namespace std;
 
     int NCol = 2; 			//Number of columns 
-    int Runs = 500;			//Number of runs 
+    int Runs = 10;			//Number of runs 
     
 int main(){
 	
