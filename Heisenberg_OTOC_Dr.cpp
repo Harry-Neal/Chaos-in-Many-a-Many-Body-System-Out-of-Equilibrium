@@ -15,7 +15,7 @@ using namespace std;
   //0.01 Global system parameters 
     int    ssize=     200;
     double lambda=    1;
-    double Jvar=      0.05;
+    double Jvar=      0.5;
     double HField[3]= {0,0,0};
     double Beta=	  2.888; 
     double dt=        0.02;
@@ -23,7 +23,7 @@ using namespace std;
     double MCVar=	  0.25; 
     double T=         200;
     double trel=	  100; 
-    double tau=       0.5;
+    double tau=       2;
     int    Runs=      100;
     double epsilon=	  0.01;
 	double T_init= 	  4000;
