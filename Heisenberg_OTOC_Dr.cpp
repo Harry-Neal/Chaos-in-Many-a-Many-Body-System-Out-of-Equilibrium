@@ -13,7 +13,7 @@ using namespace std;
 //0.0 Declare global variables 
 
   //0.01 Global system parameters 
-    int    ssize=     100;
+    int    ssize=     200;
     double lambda=    1;
     double Jvar=      0.05;
     double HField[3]= {0,0,0};
@@ -22,11 +22,11 @@ using namespace std;
     int	   MCSmp=	  5000;
     double MCVar=	  0.25; 
     double T=         200;
-    double trel=	  10; 
-    double tau =      2;
-    int    Runs=      50;
+    double trel=	  100; 
+    double tau=       0.5;
+    int    Runs=      100;
     double epsilon=	  0.01;
-	double T_init= 	  100*tau;
+	double T_init= 	  4000;
 
   //0.02 Numerical constants 
     double Pi=3.141592653589793;
@@ -386,8 +386,8 @@ int main(){
 	if(fmod(t+dt/20,tau)<= dt/2){
 	for( int j=0; j<ssize; j++){
 		for( int k=0; k<3; k++){
-			HFieldA[j][k] = HField[k]; + Hext(t+T_init-trel,k,tau);
-			HFieldB[j][k] = HField[k]; + Hext(t+T_init-trel,k,tau);
+			HFieldA[j][k] = HField[k] + Hext(t+T_init,k,tau);
+			HFieldB[j][k] = HField[k] + Hext(t+T_init,k,tau);
 		}
 	}   
 	
@@ -407,14 +407,14 @@ int main(){
 	t_step = t_step + 1;
 
 	Usys = Esys(SpinA1, SpinB1, HFieldA, HFieldB, JCplA, JCplB);
-	fprintf(Energy_out,"%lf %lf \n", t/tau + T_init/tau, Usys/(2*ssize)); 
+	fprintf(Energy_out,"%lf %lf \n", t/tau + T_init/tau, Usys/(2*ssize));
 	}
 								   
 	//7.3 Update external field 
 	for( int j=0; j<ssize; j++){
 		for( int k=0; k<3; k++){
-		HFieldA[j][k] = HField[k]; + Hext(t+T_init-trel+dt/2,k,tau);
-		HFieldB[j][k] = HField[k]; + Hext(t+T_init-trel+dt/2,k,tau);
+		HFieldA[j][k] = HField[k] + Hext(t+T_init+dt/2,k,tau);
+		HFieldB[j][k] = HField[k] + Hext(t+T_init+dt/2,k,tau);
 		}
 	}
 	//7.4 Propogate copy 1 using Suzuki-Troter decomposition

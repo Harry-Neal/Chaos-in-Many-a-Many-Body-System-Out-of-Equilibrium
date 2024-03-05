@@ -1,6 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
-runs = 10
+runs = 100
 
 spin = np.loadtxt('Spin.dat')
 

@@ -4,7 +4,7 @@ import scipy as scpy
 import re
 
 #read OTOC data
-OTOC = np.loadtxt('OTOC_Dr.dat')
+OTOC = np.loadtxt("OTOC_Dr.dat")
 
 #read parameters file
 with open('Parameters.dat') as f:
@@ -23,7 +23,7 @@ for i in range(len(parameters)):
 #declare range for OTOC data
 t_max,x_max = np.shape(OTOC)
 x = np.arange(0,x_max,1)
-t = np.arange(0,T/tau,1)
+t = np.arange(0,T,1)
 
 #=============FIRST FIGURE===============
 #=========CAN IGNORE FOR NOW============
