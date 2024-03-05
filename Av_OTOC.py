@@ -10,6 +10,8 @@ for i in range(runs):
     E = E + spin[0+i*len(time):len(time)+i*len(time),1]
 
 E=E/runs
-
-plt.plot(time,E)
+fig,ax = plt.subplots(1)
+ax.plot(time,E)
+ax.set_xlabel('$t/\\tau$')
+ax.set_ylabel('$e$')
 plt.show()
