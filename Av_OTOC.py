@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 runs = 100
 
-spin = np.loadtxt('Spin.dat')
+spin = np.loadtxt('Spin_2.dat')
 
 time = np.arange(np.min(spin[:,0]),np.max(spin[:,0]),1)
 E = np.zeros(len(time))

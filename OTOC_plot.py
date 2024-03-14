@@ -4,10 +4,10 @@ import scipy as scpy
 import re
 
 #read OTOC data
-OTOC = np.loadtxt("OTOC_Dr.dat")
+OTOC = np.loadtxt("OTOC_Dt_tau=0.5/OTOC_Dr.dat")
 
 #read parameters file
-with open('Parameters.dat') as f:
+with open('OTOC_Dt_tau=0.5/Parameters.dat') as f:
     params = f.read()
 
 #extract time step (tau) between points
@@ -71,7 +71,7 @@ plt.imshow(OTOC,extent=[min(x), max(x), min(t), max(t)],origin='lower',cmap='bwr
 #set aspect and labels
 ax3.set_aspect('equal')
 ax3.set_xlabel('x')
-ax3.set_ylabel('$t/ \\tau$')
+ax3.set_ylabel('$t$')
 
 #plot light cone fit with 
 v_b = 1.53
