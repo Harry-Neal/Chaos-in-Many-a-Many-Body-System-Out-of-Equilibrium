@@ -4,10 +4,10 @@ import scipy as scpy
 import re
 
 #read OTOC data
-OTOC = np.loadtxt("OTOC_Dt_tau=0.5/OTOC_Dr.dat")
+OTOC = np.loadtxt("OTOC_Dr_tau=2/OTOC_Dr.dat")
 
 #read parameters file
-with open('OTOC_Dt_tau=0.5/Parameters.dat') as f:
+with open('OTOC_Dr_tau=2/Parameters.dat') as f:
     params = f.read()
 
 #extract time step (tau) between points

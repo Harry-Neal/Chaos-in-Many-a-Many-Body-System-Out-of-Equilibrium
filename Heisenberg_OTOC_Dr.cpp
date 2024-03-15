@@ -13,9 +13,9 @@ using namespace std;
 //0.0 Declare global variables 
 
   //0.01 Global system parameters 
-    int    ssize=     200;
+    int    ssize=     100;
     double lambda=    1;
-    double Jvar=      0.5;
+    double Jvar=      0.05;
     double HField[3]= {0,0,0};
     double Beta=	  2.888; 
     double dt=        0.02;
@@ -26,7 +26,7 @@ using namespace std;
     double tau=       2;
     int    Runs=      100;
     double epsilon=	  0.01;
-	double T_init= 	  4000;
+	double T_init= 	  1000*tau;
 
   //0.02 Numerical constants 
     double Pi=3.141592653589793;
@@ -83,6 +83,41 @@ using namespace std;
 		return JCplA[j][k]*SpinA[j][k] + JCplB[j][k]*SpinA[0][k] - HFieldB[j][k];
     }else{
 		return JCplA[j][k]*SpinA[j][k] + JCplB[j][k]*SpinA[j+1][k] - HFieldB[j][k];
+    }
+  }
+
+  //0.3 Declare local field function on A1
+  double AField1(double SpinB1[][3], double HFieldA[][3], double JCplA[][3], double JCplB[][3], int j, int k){
+    if(j==0){
+		return JCplA[j][k]*SpinB1[j][k] + JCplB[ssize-1][k]*SpinB1[ssize-1][k] - HFieldA[j][k];
+    }else{
+		return JCplA[j][k]*SpinB1[j][k] + JCplB[j-1][k]*SpinB1[j-1][k] - HFieldA[j][k];  
+    }
+  }
+
+//0.4 Declare local field function on B1
+  double BField1(double SpinA1[][3], double HFieldB[][3],  double JCplA[][3], double JCplB[][3], int j, int k){
+    if(j==ssize-1){
+		return JCplA[j][k]*SpinA1[j][k] + JCplB[j][k]*SpinA1[0][k] - HFieldB[j][k];
+    }else{
+		return JCplA[j][k]*SpinA1[j][k] + JCplB[j][k]*SpinA1[j+1][k] - HFieldB[j][k];
+    }
+  }
+    //0.3 Declare local field function on A2
+  double AField2(double SpinB2[][3], double HFieldA[][3], double JCplA[][3], double JCplB[][3], int j, int k){
+    if(j==0){
+		return JCplA[j][k]*SpinB2[j][k] + JCplB[ssize-1][k]*SpinB2[ssize-1][k] - HFieldA[j][k];
+    }else{
+		return JCplA[j][k]*SpinB2[j][k] + JCplB[j-1][k]*SpinB2[j-1][k] - HFieldA[j][k];  
+    }
+  }
+
+//0.4 Declare local field function on B2
+  double BField2(double SpinA2[][3], double HFieldB[][3],  double JCplA[][3], double JCplB[][3], int j, int k){
+    if(j==ssize-1){
+		return JCplA[j][k]*SpinA2[j][k] + JCplB[j][k]*SpinA2[0][k] - HFieldB[j][k];
+    }else{
+		return JCplA[j][k]*SpinA2[j][k] + JCplB[j][k]*SpinA2[j+1][k] - HFieldB[j][k];
     }
   }
   
@@ -297,7 +332,7 @@ int main(){
 	}		
 	}
 
-	// 5.1 Evolve spin configiration for T_init steps
+	// 5.1 Evolve spin configiration for T_init time steps
 	for(double t=0; t<=T_init; t=t+dt){
 	//5.1 Set external field and evaluate observables (stroboscopically)
 	if(fmod(t+dt/20,tau)<= dt/2){
@@ -406,7 +441,7 @@ int main(){
 	//7.2.5 increment time step
 	t_step = t_step + 1;
 
-	Usys = Esys(SpinA1, SpinB1, HFieldA, HFieldB, JCplA, JCplB);
+	Usys = Esys(SpinA2, SpinB2, HFieldA, HFieldB, JCplA, JCplB);
 	fprintf(Energy_out,"%lf %lf \n", t/tau + T_init/tau, Usys/(2*ssize));
 	}
 								   
@@ -421,7 +456,7 @@ int main(){
 	  //7.4.1 Propagate spin configuration on A1
 	  for( int j=0; j<ssize; j++){
   
-		for( int k=0; k<3; k++){FieldL[k] = AField(SpinB1, HFieldA, JCplA, JCplB, j, k);}
+		for( int k=0; k<3; k++){FieldL[k] = AField1(SpinB1, HFieldA, JCplA, JCplB, j, k);}
 		StrthL = sqrt(pow(FieldL[0],2) + pow(FieldL[1],2) + pow(FieldL[2],2));
 	  
 		if(StrthL==0){}else{
@@ -434,7 +469,7 @@ int main(){
 	  //7.4.2 Propagate spin configuration on B1
 	  for( int j=0; j<ssize; j++){
   
-		for( int k=0; k<3; k++){FieldL[k] = BField(SpinA1, HFieldB, JCplA, JCplB, j, k);}
+		for( int k=0; k<3; k++){FieldL[k] = BField1(SpinA1, HFieldB, JCplA, JCplB, j, k);}
 		StrthL = sqrt(pow(FieldL[0],2) + pow(FieldL[1],2) + pow(FieldL[2],2));
 		
 		if(StrthL==0){}else{
@@ -447,7 +482,7 @@ int main(){
 	  //7.4.3 Propagate spin configuration on A1
 	  for( int j=0; j<ssize; j++){
   
-		for( int k=0; k<3; k++){FieldL[k] = AField(SpinB1, HFieldA, JCplA, JCplB, j, k);}
+		for( int k=0; k<3; k++){FieldL[k] = AField1(SpinB1, HFieldA, JCplA, JCplB, j, k);}
 		StrthL = sqrt(pow(FieldL[0],2) + pow(FieldL[1],2) + pow(FieldL[2],2));
 	  
 		if(StrthL==0){}else{
@@ -461,7 +496,7 @@ int main(){
 	  //7.5.1 Propagate spin configuration on A2
 	  for( int j=0; j<ssize; j++){
   
-		for( int k=0; k<3; k++){FieldL[k] = AField(SpinB2, HFieldA, JCplA, JCplB, j, k);}
+		for( int k=0; k<3; k++){FieldL[k] = AField2(SpinB2, HFieldA, JCplA, JCplB, j, k);}
 		StrthL = sqrt(pow(FieldL[0],2) + pow(FieldL[1],2) + pow(FieldL[2],2));
 	  
 		if(StrthL==0){}else{
@@ -474,7 +509,7 @@ int main(){
 	  //7.5.2 Propagate spin configuration on B2
 	  for( int j=0; j<ssize; j++){
   
-		for( int k=0; k<3; k++){FieldL[k] = BField(SpinA2, HFieldB, JCplA, JCplB, j, k);}
+		for( int k=0; k<3; k++){FieldL[k] = BField2(SpinA2, HFieldB, JCplA, JCplB, j, k);}
 		StrthL = sqrt(pow(FieldL[0],2) + pow(FieldL[1],2) + pow(FieldL[2],2));
 		
 		if(StrthL==0){}else{
@@ -487,7 +522,7 @@ int main(){
 	  //7.5.3 Propagate spin configuration on A2
 	  for( int j=0; j<ssize; j++){
   
-		for( int k=0; k<3; k++){FieldL[k] = AField(SpinB2, HFieldA, JCplA, JCplB, j, k);}
+		for( int k=0; k<3; k++){FieldL[k] = AField2(SpinB2, HFieldA, JCplA, JCplB, j, k);}
 		StrthL = sqrt(pow(FieldL[0],2) + pow(FieldL[1],2) + pow(FieldL[2],2));
 	  
 		if(StrthL==0){}else{
