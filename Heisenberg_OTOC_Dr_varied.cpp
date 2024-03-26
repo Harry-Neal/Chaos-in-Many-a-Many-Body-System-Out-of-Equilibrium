@@ -23,10 +23,10 @@ using namespace std;
     double MCVar=	  0.25; 
     double T=         200;
     double trel=	  100; 
-    double tau=       5;
+    double tau;
     int    Runs=      100;
     double epsilon=	  0.01;
-	double T_init= 	  1000*tau;
+	double T_init;
 
   //0.02 Numerical constants 
     double Pi=3.141592653589793;
@@ -125,6 +125,12 @@ using namespace std;
 }
 
 int main(){
+    ifstream MyReadFile("tau.txt");
+    string myText;
+    getline (MyReadFile, myText);
+    tau = std::stod(myText);
+    T_init = 1000*tau;
+
 	std::clock_t c_start = std::clock();  	
   //1 Declare variables
   

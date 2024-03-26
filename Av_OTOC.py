@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 runs = 100
 
-spin = np.loadtxt('OTOC_Dr_tau=0.5/Spin.dat')
+spin = np.loadtxt('OTOC_Dr_tau=5/Spin.dat')
 
 time = np.arange(np.min(spin[:,0]),np.max(spin[:,0]),1)
 E = np.zeros(len(time))
