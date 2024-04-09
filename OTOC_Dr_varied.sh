@@ -1,8 +1,7 @@
 #!/bin/bash
 make Heisenberg_OTOC_Dr_varied
-mkdir OTOCs
 cd OTOCs
-tau="0.5 1.0 1.5 2.0 2.5 3.0 3.5 4.0 4.5 5.0"
+tau="0.75 1.25 1.75 2.25 2.75 3.25 3.75 4.25 4.75 5.25 5.5 5.75 6.0"
 for i in $tau
 do
 mkdir $i
