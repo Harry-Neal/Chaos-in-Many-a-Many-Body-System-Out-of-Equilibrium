@@ -4,10 +4,10 @@ import scipy as scpy
 import re
 
 #read OTOC data
-OTOC = np.loadtxt("OTOC_good_equlib/OTOC.dat")
+OTOC = np.loadtxt("Next Nearest Neighbour/OTOC_Dr.dat")
 
 #read parameters file
-with open('OTOC_good_equlib/Parameters.dat') as f:
+with open('Next Nearest Neighbour/Parameters.dat') as f:
     params = f.read()
 
 #extract time step (tau) between points
@@ -74,7 +74,7 @@ ax3.set_xlabel('x')
 ax3.set_ylabel('$t$')
 
 #plot light cone fit with 
-v_b = 1.64
+v_b = 1.926
 ax3.plot(x,(1/v_b)*np.abs(x),'black',label=f"t=|x|/{v_b}")
 ax3.set_ylim(( min(t), max(t)))
 #add color bar

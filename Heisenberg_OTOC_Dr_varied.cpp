@@ -15,7 +15,7 @@ using namespace std;
   //0.01 Global system parameters 
     int    ssize=     100;
     double lambda=    1;
-    double Jvar=      0.05;
+    double Jvar=      0.5;
     double HField[3]= {0,0,0};
     double Beta=	  2.888; 
     double dt=        0.02;
@@ -129,7 +129,7 @@ int main(){
     string myText;
     getline (MyReadFile, myText);
     tau = std::stod(myText);
-    T_init = 1000*tau;
+    T_init = 100*tau;
 
 	std::clock_t c_start = std::clock();  	
   //1 Declare variables

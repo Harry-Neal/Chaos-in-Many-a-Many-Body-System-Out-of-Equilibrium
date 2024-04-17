@@ -15,7 +15,7 @@ using namespace std;
   //0.01 Global system parameters 
     int    ssize=     100;
     double lambda=    1;
-    double Jvar=      0.05;
+    double Jvar=      0.5;
     double HField[3]= {0,0,0};
     double Beta=	  2.888; 
     double dt=        0.02;
@@ -26,7 +26,7 @@ using namespace std;
     double tau=       5;
     int    Runs=      100;
     double epsilon=	  0.01;
-	double T_init= 	  1000*tau;
+	double T_init= 	  100*tau;
 
   //0.02 Numerical constants 
     double Pi=3.141592653589793;

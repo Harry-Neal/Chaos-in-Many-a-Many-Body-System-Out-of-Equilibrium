@@ -5,9 +5,9 @@ import scipy.optimize as opt
 
 def line(x,m,c):
     return m*x + c
-taus = np.arange(0.5,5.5,0.5)
+taus = np.arange(1,4.5,0.5)
 for tau_cur in taus:
-    path = 'OTOCs/' + str(tau_cur) + '/'
+    path = 'OTOCsdj0.5/' + str(tau_cur) + '/'
     OTOC = np.loadtxt(path+'OTOC_Dr.dat')
 
     #read parameters file
