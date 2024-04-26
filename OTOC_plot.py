@@ -74,7 +74,7 @@ ax3.set_xlabel('x')
 ax3.set_ylabel('$t$')
 
 #plot light cone fit with 
-v_b = 1.926
+v_b = 3.6378
 ax3.plot(x,(1/v_b)*np.abs(x),'black',label=f"t=|x|/{v_b}")
 ax3.set_ylim(( min(t), max(t)))
 #add color bar

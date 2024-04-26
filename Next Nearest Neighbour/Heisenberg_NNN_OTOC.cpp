@@ -20,13 +20,13 @@ using namespace std;
     double dt=        0.02;
     int	   MCSmp=	  5000;
     double MCVar=	  0.25; 
-    double T=         1000;
+    double T=         400;
     double trel=	  100; 
     double tau=       2;
     int    Runs=      100;
     double epsilon=	  0.01;
     double T_init=    500;
-	double NNN_factor=4;
+	double NNN_factor=1.0;
 
   //0.02 Numerical constants 
     double Pi=3.141592653589793;
@@ -222,6 +222,7 @@ std::clock_t c_start = std::clock();
     fprintf(Parameters,"trel:     	%lf \n", trel);
     fprintf(Parameters,"tau:     	%lf \n", tau);
     fprintf(Parameters,"Runs:    	%i  \n", Runs);
+	fprintf(Parameters,"NNN_factor: %lf \n", NNN_factor)
     fclose(Parameters);
   
   //3 Open output file and start iteration over trajectories (Runs) 
