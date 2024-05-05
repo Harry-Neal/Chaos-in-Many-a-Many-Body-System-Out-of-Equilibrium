@@ -23,7 +23,7 @@ using namespace std;
     double MCVar=	  0.25; 
     double T=         200;
     double trel=	  100; 
-    double tau=       5;
+    double tau=       1.25;
     int    Runs=      100;
     double epsilon=	  0.01;
 	double T_init= 	  100*tau;
@@ -384,7 +384,9 @@ int main(){
 	for(double t=0; t<=T; t=t+dt){
 
 	//7.1 Set external field and evaluate observables (stroboscopically)
-	if(fmod(t+dt/20,tau)<= dt/2){
+	if(fmod(t+dt/20,tau)<= dt){
+		std::cout << t/tau;
+		std::cout << "\n";
 	for( int j=0; j<ssize; j++){
 		for( int k=0; k<3; k++){
 			HFieldA[j][k] = HField[k] + Hext(t+T_init,k,tau);

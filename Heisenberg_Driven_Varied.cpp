@@ -15,10 +15,10 @@ using namespace std;
   //0.01 Global system parameters 
     int    ssize=    10;
     double lambda=    1;
-    double Jvar=      0.05;
+    double Jvar=      0.5;
     double HField[3]= {0,0,0};
     double Beta=	  2.888; 
-    double dt=        0.02;
+    double dt=        0.005;
     int	   MCSmp=	  2500;
     double MCVar=	  0.25; 
     double T=         4000;
@@ -180,7 +180,7 @@ std::clock_t c_start = std::clock();
     Output = fopen("Avg_energy.dat","w+");
   //3 Start iteration over trajectories (Runs) 
 	for( int u=0; u<Runs; u++){
-	
+	std::cout << "run " << u << " out of " << Runs << "\n"; 
   //4 Initialize system variables 
 	//4.1 Initialize magnetic field with time independent external field  
 	for( int j=0; j<ssize; j++){

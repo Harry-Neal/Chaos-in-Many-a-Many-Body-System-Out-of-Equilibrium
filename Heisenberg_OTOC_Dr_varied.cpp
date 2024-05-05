@@ -15,10 +15,10 @@ using namespace std;
   //0.01 Global system parameters 
     int    ssize=     100;
     double lambda=    1;
-    double Jvar=      0.5;
+    double Jvar=      0.35;
     double HField[3]= {0,0,0};
     double Beta=	  2.888; 
-    double dt=        0.02;
+    double dt=        0.005;
     int	   MCSmp=	  5000;
     double MCVar=	  0.25; 
     double T=         200;

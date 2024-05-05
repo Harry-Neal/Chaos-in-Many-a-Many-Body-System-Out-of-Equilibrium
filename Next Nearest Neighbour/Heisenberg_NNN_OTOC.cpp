@@ -22,7 +22,7 @@ using namespace std;
     double MCVar=	  0.25; 
     double T=         400;
     double trel=	  100; 
-    double tau=       2;
+    double tau=       1;
     int    Runs=      100;
     double epsilon=	  0.01;
     double T_init=    500;
@@ -222,7 +222,7 @@ std::clock_t c_start = std::clock();
     fprintf(Parameters,"trel:     	%lf \n", trel);
     fprintf(Parameters,"tau:     	%lf \n", tau);
     fprintf(Parameters,"Runs:    	%i  \n", Runs);
-	fprintf(Parameters,"NNN_factor: %lf \n", NNN_factor)
+	fprintf(Parameters,"NNN_factor: %lf \n", NNN_factor);
     fclose(Parameters);
   
   //3 Open output file and start iteration over trajectories (Runs) 
@@ -363,9 +363,9 @@ std::clock_t c_start = std::clock();
 		if(t>=trel){
 			for( int j=0; j<ssize; j++){
 				for( int k=0; k<3; k++){
-					HFieldA[j][k] = HField[k] + Hext(t-trel,k);
-					HFieldB[j][k] = HField[k] + Hext(t-trel,k);
-                    HFieldC[j][k] = HField[k] + Hext(t-trel,k);
+					HFieldA[j][k] = HField[k]; //+ Hext(t-trel,k);
+					HFieldB[j][k] = HField[k]; //+ Hext(t-trel,k);
+                    HFieldC[j][k] = HField[k]; //+ Hext(t-trel,k);
 				}
 			}   
 		}
@@ -379,9 +379,9 @@ std::clock_t c_start = std::clock();
 	 if(t>=trel){
 	    for( int j=0; j<ssize; j++){
 		  for( int k=0; k<3; k++){
-		    HFieldA[j][k] = HField[k] + Hext(t-trel+dt/2,k);
-		    HFieldB[j][k] = HField[k] + Hext(t-trel+dt/2,k);
-            HFieldC[j][k] = HField[k] + Hext(t-trel+dt/2,k);
+		    HFieldA[j][k] = HField[k]; //+ Hext(t-trel+dt/2,k);
+		    HFieldB[j][k] = HField[k]; //+ Hext(t-trel+dt/2,k);
+            HFieldC[j][k] = HField[k]; //+ Hext(t-trel+dt/2,k);
 		  }
 		}
 	}
@@ -483,9 +483,9 @@ std::clock_t c_start = std::clock();
 		if(t>=trel){
 			for( int j=0; j<ssize; j++){
 				for( int k=0; k<3; k++){
-					HFieldA[j][k] = HField[k] + Hext(t+T_init,k);
-					HFieldB[j][k] = HField[k] + Hext(t+T_init,k);
-                    HFieldC[j][k] = HField[k] + Hext(t+T_init,k);
+					HFieldA[j][k] = HField[k]; //+ Hext(t+T_init,k);
+					HFieldB[j][k] = HField[k]; //+ Hext(t+T_init,k);
+                    HFieldC[j][k] = HField[k]; //+ Hext(t+T_init,k);
 				}
 			}   
 		}
@@ -515,9 +515,9 @@ std::clock_t c_start = std::clock();
 	 if(t>=trel){
 	    for( int j=0; j<ssize; j++){
 		  for( int k=0; k<3; k++){
-		    HFieldA[j][k] = HField[k] + Hext(t+T_init+dt/2,k);
-		    HFieldB[j][k] = HField[k] + Hext(t+T_init+dt/2,k);
-            HFieldC[j][k] = HField[k] + Hext(t+T_init+dt/2,k);
+		    HFieldA[j][k] = HField[k]; //+ Hext(t+T_init+dt/2,k);
+		    HFieldB[j][k] = HField[k]; //+ Hext(t+T_init+dt/2,k);
+            HFieldC[j][k] = HField[k]; //+ Hext(t+T_init+dt/2,k);
 		  }
 		}
 	}

@@ -16,7 +16,7 @@ using namespace std;
     int    ssize=     50;
     double lambda=    1;
     double Jvar=      0.5;
-	double Kvar=	  0.5;
+	double Kvar=	  0;
     double HField[3]= {0,0,0};
     double Beta=	  2.888; 
     double dt=        0.02;
@@ -26,7 +26,7 @@ using namespace std;
     double trel=	  100; 
     double tau;
     int    Runs=      10;
-	double NNN_factor=1;
+	double NNN_factor=0;
 
   //0.02 Numerical constants 
     double Pi=3.141592653589793;
@@ -230,19 +230,34 @@ std::clock_t c_start = std::clock();
 	        JCplA[j][k] = 1 + Jdist(e2);
 	        JCplB[j][k] = 1 + Jdist(e2);
 			JCplC[j][k] = 1 + Jdist(e2);
+			if(NNN_factor == 0){
+			KCplA[j][k] = 0;
+			KCplB[j][k] = 0; 
+			KCplC[j][k] = 0;
+			}
 
+			else{
 			KCplA[j][k] = (1/NNN_factor) + Kdist(e2);
 			KCplB[j][k] = (1/NNN_factor) + Kdist(e2); 
 			KCplC[j][k] = (1/NNN_factor) + Kdist(e2); 
+			}
 
 	      }else{
 	        JCplA[j][k] = lambda + Jdist(e2);
 	        JCplB[j][k] = lambda + Jdist(e2);
 			JCplC[j][k] = lambda + Jdist(e2);
-
-			KCplA[j][k] = (lambda/NNN_factor) + Kdist(e2);
-			KCplB[j][k] = (lambda/NNN_factor) + Kdist(e2);
-			KCplC[j][k] = (lambda/NNN_factor) + Kdist(e2);
+			
+			if(NNN_factor == 0){
+			KCplA[j][k] = 0;
+			KCplB[j][k] = 0; 
+			KCplC[j][k] = 0;
+			}
+			
+			else{
+			KCplA[j][k] = (1/NNN_factor) + Kdist(e2);
+			KCplB[j][k] = (1/NNN_factor) + Kdist(e2); 
+			KCplC[j][k] = (1/NNN_factor) + Kdist(e2); 
+			}
 	      }
 	    }
 	  }  

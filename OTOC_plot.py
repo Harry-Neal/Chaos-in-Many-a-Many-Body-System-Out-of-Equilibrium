@@ -3,11 +3,12 @@ import numpy as np
 import scipy as scpy
 import re
 
+path = 'Next Nearest Neighbour'
 #read OTOC data
-OTOC = np.loadtxt("Next Nearest Neighbour/OTOC_Dr.dat")
+OTOC = np.loadtxt(path+"/OTOC_Dr.dat")
 
 #read parameters file
-with open('Next Nearest Neighbour/Parameters.dat') as f:
+with open(path+'/Parameters.dat') as f:
     params = f.read()
 
 #extract time step (tau) between points
@@ -57,8 +58,9 @@ t = np.arange(0,T+tau,tau)
 # ax2.legend()
 
 #============SECOND FIGURE===============
-fig =plt.figure()
+fig = plt.figure(figsize=(10,8))
 ax3 = plt.axes([0.1,0.1,0.7,0.8])
+
 
 #roll OTOC data along position axis so x=0 is in the middle
 OTOC = np.roll(OTOC,x_max//2,axis=1)
@@ -67,19 +69,25 @@ OTOC = np.roll(OTOC,x_max//2,axis=1)
 x = np.arange(-x_max//2,x_max//2,1)
 
 #plot shifted data
-plt.imshow(OTOC,extent=[min(x), max(x), min(t), max(t)],origin='lower',cmap='bwr')
+plt.pcolor(x,t,OTOC,vmin=0., vmax=1,cmap='bwr')
 #set aspect and labels
-ax3.set_aspect('equal')
-ax3.set_xlabel('x')
-ax3.set_ylabel('$t$')
+
 
 #plot light cone fit with 
-v_b = 3.6378
-ax3.plot(x,(1/v_b)*np.abs(x),'black',label=f"t=|x|/{v_b}")
+v_b = 3.7715
+ax3.plot(x,(1/v_b)*np.abs(x) + 5,'black',label=f"t=|x|/{v_b}",linewidth=2)
 ax3.set_ylim(( min(t), max(t)))
+ax3.set_xlim(-250,250)
+ax3.set_aspect('auto')
+ax3.set_xlabel('x',size=30)
+ax3.set_ylabel('$t$',size=30)
+ax3.legend(fontsize=20)
+ax3.tick_params(labelsize=20)
 #add color bar
 cax = plt.axes((0.85, 0.1, 0.05, 0.8))
 plt.colorbar(cax=cax)
-cax.set_ylabel('D(x,t)')
-ax3.legend()
+cax.set_ylabel('D(x,t)',size=30)
+cax.set_ylim(0,1)
+cax.tick_params(labelsize=20)
+
 plt.show()
