@@ -21,8 +21,8 @@ int main(){
     FILE *Data;				//Input file
 	FILE *Output; 			//Output files
 	  
-    Data = fopen("Spin.dat","r");
-    Output = fopen("Av.dat","w+");
+    Data = fopen("e_trajectories/tau=4/Spin.dat","r");
+    Output = fopen("e_trajectories/tau=4/Av.dat","w+");
     
     fscanf(Data,"%lf", &t[0]); 
 	for(int r=0; r<NCol-1; r++){fscanf(Data,"%lf", &Val[r]);}
@@ -40,7 +40,7 @@ int main(){
     for(int r=0; r<SPL; r++){for(int u=0; u<NCol; u++){AvrArray[r][u]=0;}}
 		
 	fclose(Data); 
-	Data = fopen("Spin.dat","r");
+	Data = fopen("e_trajectories/tau=4/Spin.dat","r");
 	
 	for(int k=0; k<Runs; k++){
 	  for(int p=0; p<SPL; p++){
