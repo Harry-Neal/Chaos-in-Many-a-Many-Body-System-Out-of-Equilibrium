@@ -6,7 +6,7 @@ import scipy.optimize as opt
 def line(x,m,c):
     return m*x + c
 
-betas=[0.0,1.06,2.88]
+betas=[0.0,1.062,2.888]
 djs=[0.0,0.05,0.1,0.15,0.2,0.25,0.3,0.35,0.4,0.45,0.5]
 v_bs=np.zeros((len(betas),len(djs)))
 
@@ -16,7 +16,7 @@ ax = plt.axes()
 for p,beta in enumerate(betas):
     for m,dj in enumerate(djs):
 
-        path = 'OTOC_dj_varied/'+ str(beta) +'/' + str(dj)+ '/'
+        path = 'Figures/Fig 7/OTOC_dj_varied/'+ str(beta) +'/' + str(dj)+ '/'
         OTOC = np.loadtxt(path+'OTOC.dat')
 
         #read parameters file
