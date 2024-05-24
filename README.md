@@ -1,6 +1,6 @@
 # Chaos in Many a Many Body System Out of Equilibrium
 This repository contains the data and code used to generate the figures in my Master's dissertation.
-The code simlates a 
+The code simlates a Classical Heisenberg Spin chain with nearest neighbour interactions and anisotropic coupling.
 
 # Structure of Repository
 * Source C++ code used for the numerical simulations in `Code`.
